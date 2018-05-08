@@ -35,7 +35,6 @@ const replaceLoaderIdentName = (loader, newIdent) => {
  */
 module.exports.modifyWebpackConfig = ({ config, stage }, pluginOptions) => {
   const includeSASS = pluginOptions.includeSASS || false;
-  if (stage !== "develop") return config;
 
   config.loader(`cssModules`, current => {
     const index = current.loaders.findIndex(loader =>
