@@ -42,7 +42,7 @@ module.exports.modifyWebpackConfig = ({ config, stage }, pluginOptions) => {
     );
 
     const newLoader = replaceLoaderIdentName(
-      stage
+      stage,
       current.loaders[index],
       pluginOptions.localIdentName
     );
@@ -58,7 +58,7 @@ module.exports.modifyWebpackConfig = ({ config, stage }, pluginOptions) => {
       );
 
       const newLoader = replaceLoaderIdentName(
-        stage
+        stage,
         current.loaders[index],
         pluginOptions.localIdentName
       );
