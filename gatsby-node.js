@@ -10,8 +10,8 @@ const { cssModulesConfig } = require("gatsby-1-config-css-modules");
  * @param {string} loader
  * @param {string} newIdent
  */
-const replaceLoaderIdentName = (loader, newIdent) => {
-  const defaultConfig = cssModulesConfig("develop");
+const replaceLoaderIdentName = (stage, loader, newIdent) => {
+  const defaultConfig = cssModulesConfig(stage);
   // Split loader string out into parts
   const parts = defaultConfig.split("&");
 
@@ -42,6 +42,7 @@ module.exports.modifyWebpackConfig = ({ config, stage }, pluginOptions) => {
     );
 
     const newLoader = replaceLoaderIdentName(
+      stage
       current.loaders[index],
       pluginOptions.localIdentName
     );
@@ -57,6 +58,7 @@ module.exports.modifyWebpackConfig = ({ config, stage }, pluginOptions) => {
       );
 
       const newLoader = replaceLoaderIdentName(
+        stage
         current.loaders[index],
         pluginOptions.localIdentName
       );
