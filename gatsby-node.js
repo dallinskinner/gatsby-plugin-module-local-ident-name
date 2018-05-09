@@ -5,14 +5,17 @@
  * @param {object} current
  * @param {string} newIdent
  */
+
+const identMatch = /(localIdentName=)(.+?)(?=&|!|$)/;
+
 const replaceLoaderIdentName = (current, newIdent) => {
   if (current.hasOwnProperty('loaders')) {
     const index = current.loaders.findIndex(loader => loader.startsWith('css?'));
     const loader = current.loaders[index];
 
-    current.loaders[index] = loader.replace(/localIdentName=(.+)&/, `localIdentName=${newIdent}&`);
-  } else if (current.hasOwnProperty['loader']) {
-    current.loader = current.loader.replace(/localIdentName=(.+)&/, `localIdentName=${newIdent}&`);
+    current.loaders[index] = loader.replace(identMatch, `$1${newIdent}`);
+  } else if (current.hasOwnProperty('loader')) {
+    current.loader = current.loader.replace(identMatch, `$1${newIdent}`);
   }
 
   return current;
