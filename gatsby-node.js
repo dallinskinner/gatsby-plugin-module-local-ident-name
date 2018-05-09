@@ -1,70 +1,39 @@
-const { cssModulesConfig } = require("gatsby-1-config-css-modules");
-
 /**
- * Takes a loader string like:
- *
- * css?modules&minimize&importLoaders=1&localIdentName=[path]---[name]---[local]---[hash:base64:5]&sourceMap
- *
+ * Takes the current loader, determines if it's using a string or an array
  * and replaces localIdentName's value with newIdent
  *
- * @param {string} loader
+ * @param {object} current
  * @param {string} newIdent
  */
-const replaceLoaderIdentName = (stage, loader, newIdent) => {
-  const defaultConfig = cssModulesConfig(stage);
-  // Split loader string out into parts
-  const parts = defaultConfig.split("&");
+const replaceLoaderIdentName = (current, newIdent) => {
+  if (current.hasOwnProperty('loaders')) {
+    const index = current.loaders.findIndex(loader => loader.startsWith('css?'));
+    const loader = current.loaders[index];
 
-  // Find ident
-  const identIndex = parts.findIndex(el => el.startsWith("localIdentName"));
-  const ident = parts[identIndex];
-  const identParts = ident.split("=");
+    current.loaders[index] = loader.replace(/localIdentName=(.+)&/, `localIdentName=${newIdent}&`);
+  } else if (current.hasOwnProperty['loader']) {
+    current.loader = current.loader.replace(/localIdentName=(.+)&/, `localIdentName=${newIdent}&`);
+  }
 
-  // Replace existing ident with new
-  const replacedIdent = [identParts[0], "=", newIdent].join("");
-
-  // Join parts back into a string
-  const newConfig = parts.map(
-    (el, i) => (i === identIndex ? replacedIdent : el)
-  );
-  return newConfig.join("&");
+  return current;
 };
 
 /**
  * Modify the cssModules loader with a new localIdentName
  */
-module.exports.modifyWebpackConfig = ({ config, stage }, pluginOptions) => {
+module.exports.modifyWebpackConfig = ({
+  config,
+  stage
+}, pluginOptions) => {
   const includeSASS = pluginOptions.includeSASS || false;
 
   config.loader(`cssModules`, current => {
-    const index = current.loaders.findIndex(loader =>
-      loader.startsWith("css?")
-    );
-
-    const newLoader = replaceLoaderIdentName(
-      stage,
-      current.loaders[index],
-      pluginOptions.localIdentName
-    );
-
-    current.loaders[index] = newLoader;
-    return current;
+    return replaceLoaderIdentName(current, pluginOptions.localIdentName);
   });
 
   if (includeSASS) {
     config.loader(`sassModules`, current => {
-      const index = current.loaders.findIndex(loader =>
-        loader.startsWith("css?")
-      );
-
-      const newLoader = replaceLoaderIdentName(
-        stage,
-        current.loaders[index],
-        pluginOptions.localIdentName
-      );
-
-      current.loaders[index] = newLoader;
-      return current;
+      return replaceLoaderIdentName(current, pluginOptions.localIdentName);
     });
   }
   return config;
